@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Printer base body -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M32,44 C32,40.68 34.68,38 38,38 L70,38 C73.32,38 76,40.68 76,44 L76,74 C76,77.32 73.32,80 70,80 L38,80 C34.68,80 32,77.32 32,74 Z" />
+    <!-- Printer head slot -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M38,44 L70,44 C71.1,44 72,44.9 72,46 C72,47.1 71.1,48 70,48 L38,48 C36.9,48 36,47.1 36,46 C36,44.9 36.9,44 38,44 Z" />
+    <!-- Receipt Paper coming out of slot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,24 L68,24 L68,45 L40,45 Z" />
+    <!-- Receipt serrated top edge -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,24 L43,20 L46,24 L49,20 L52,24 L55,20 L58,24 L61,20 L64,24 L68,24 L68,26 L40,26 Z" />
+    <!-- Receipt print lines -->
+    <path
+        android:fillColor="#64748B"
+        android:pathData="M44,28 L64,28 A1,1 0 0,0 64,26 L44,26 A1,1 0 0,0 44,28 Z" />
+    <path
+        android:fillColor="#64748B"
+        android:pathData="M44,33 L58,33 A1,1 0 0,0 58,31 L44,31 A1,1 0 0,0 44,33 Z" />
+    <path
+        android:fillColor="#64748B"
+        android:pathData="M44,38 L62,38 A1,1 0 0,0 62,36 L44,36 A1,1 0 0,0 44,38 Z" />
+    <!-- Printer status indicator light (green) -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M40,58 A3,3 0 1,0 40,52 A3,3 0 1,0 40,58 Z" />
+    <!-- Bluetooth symbol inside printer button -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,54 L62.5,51.5 L60,49 L60,59 L62.5,56.5 L60,54 Z M60.8,54 L61.5,54.7 L60.8,55.4 Z M60.8,52.6 L61.5,53.3 L60.8,54 Z" />
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M56,66 L68,66 C69.1,66 70,66.9 70,68 C70,69.1 69.1,70 68,70 L56,70 C54.9,70 54,69.1 54,68 C54,66.9 54.9,66 56,66 Z" />
+</vector>

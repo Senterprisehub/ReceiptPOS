@@ -1,0 +1,7 @@
+{
+  "name": "Receipt POS",
+  "description": "Secure mobile POS receipt generator with Bluetooth ESC/POS thermal printing, offline data sync engine, and receipt history.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
