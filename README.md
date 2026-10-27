@@ -8,11 +8,11 @@
   <img src="https://img.shields.io/badge/Cloud%20Backup-Google%20Drive-FF6B6B" alt="Cloud Backup" />
 </p>
 
-# POS Thermal Bill Pro
+# Receipt POS
 
-Transform any Android phone or tablet into a high-speed, enterprise-grade Point of Sale (POS) register. Built for retail shops, supermarkets, cafes, restaurants, boutiques, pharmacies, and multi-counter businesses, POS Thermal Bill Pro combines lightning-fast checkout, native ESC/POS thermal printing, external barcode gun support, smart credit notes, and multi-device Google Drive sync in one zero-latency offline-first application.
+Transform any Android phone or tablet into a high-speed, enterprise-grade Point of Sale (POS) register. Built for retail shops, supermarkets, cafes, restaurants, boutiques, pharmacies, and multi-counter businesses, Receipt POS combines lightning-fast checkout, native ESC/POS thermal printing, external barcode gun support, smart credit notes, and multi-device Google Drive sync in one zero-latency offline-first application.
 
-## Why business owners choose POS Thermal Bill Pro
+## Why business owners choose Receipt POS
 
 - 100% Offline-First Reliability: Never lose a sale when the internet drops. Process bills, print receipts, and track stock completely offline.
 - Multi-Counter Collision-Free Billing: Run multiple billing counters (C1, C2, C3, C4+) simultaneously under a single Google Drive account without invoice or credit note numbering conflicts.
@@ -134,4 +134,4 @@ This solution combines the following into one application:
 
 ---
 
-Download POS Thermal Bill Pro today and upgrade your checkout counter with speed, accuracy, and total control!
+Download Receipt POS today and upgrade your checkout counter with speed, accuracy, and total control!
