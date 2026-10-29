@@ -1,74 +1,879 @@
-const releaseApiUrl = 'https://api.github.com/repos/Senterprisehub/ReceiptPOS/releases/latest';
-const directApkUrl = 'https://github.com/Senterprisehub/ReceiptPOS/releases/download/1stRelese/Receipt.POS.-.v1.0.apk';
-const downloadLink = document.getElementById('downloadLink');
-const primaryDownloadButton = document.getElementById('primaryDownloadButton');
-const headerDownloadButton = document.getElementById('headerDownloadButton');
-const releaseMeta = document.getElementById('releaseMeta');
-const releaseStatus = document.getElementById('releaseStatus');
-const footerStatus = document.getElementById('footerStatus');
-const ctaText = document.getElementById('ctaText');
-const isAndroidDevice = /Android/i.test(navigator.userAgent || '');
-
-function applyApkLink(url, label) {
-  const links = [downloadLink, primaryDownloadButton, headerDownloadButton];
-
-  links.forEach((link) => {
-    if (!link) return;
-
-    link.href = url;
-    link.setAttribute('aria-label', `Download ${label}`);
-    link.setAttribute('download', 'ReceiptPOS.apk');
-    link.target = isAndroidDevice ? '_self' : '_blank';
-    link.rel = isAndroidDevice ? '' : 'noopener noreferrer';
-  });
-}
-
-function formatDate(dateString) {
-  if (!dateString) return 'Unknown date';
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  }).format(date);
-}
-
-async function updateLatestRelease() {
-  try {
-    const response = await fetch(releaseApiUrl, {
-      headers: {
-        'Accept': 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28'
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Receipt POS is an offline-first POS and billing app for retail stores, cafes, and multi-counter shops."
+    />
+    <title>Receipt POS | Offline-First Android POS</title>
+    <style>
+      :root {
+        --bg: #07141d;
+        --bg-soft: #0f1f2a;
+        --panel: rgba(10, 22, 31, 0.9);
+        --panel-alt: rgba(18, 34, 46, 0.85);
+        --line: rgba(148, 163, 184, 0.16);
+        --text: #eaf7ff;
+        --muted: #9db7c5;
+        --primary: #4cc9f0;
+        --secondary: #7c3aed;
+        --green: #22c55e;
+        --gold: #fbbf24;
+        --danger: #f87171;
+        --shadow: 0 24px 60px rgba(23, 37, 84, 0.35);
       }
-    });
 
-    if (!response.ok) {
-      throw new Error('Unable to fetch release data');
-    }
+      * { box-sizing: border-box; }
 
-    const data = await response.json();
+      html {
+        scroll-behavior: smooth;
+      }
 
-    const asset = Array.isArray(data.assets) && data.assets.length > 0 ? data.assets[0] : null;
-    const apkUrl = asset ? asset.browser_download_url : directApkUrl;
-    const versionLabel = data.tag_name || 'Latest Release';
-    const publishedDate = formatDate(data.published_at || data.created_at);
+      body {
+        margin: 0;
+        font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(76, 201, 240, 0.12), transparent 30%),
+          radial-gradient(circle at top right, rgba(124, 58, 237, 0.18), transparent 28%),
+          var(--bg);
+        color: var(--text);
+      }
 
-    const text = `Version ${versionLabel} · Published ${publishedDate}`;
-    releaseMeta.textContent = text;
-    releaseStatus.textContent = 'Newest';
-    footerStatus.textContent = `Latest release: ${versionLabel}`;
-    ctaText.textContent = `Current version: ${versionLabel}. Download the APK optimized for Android devices.`;
+      img {
+        max-width: 100%;
+        display: block;
+      }
 
-    applyApkLink(apkUrl, versionLabel);
-    releaseMeta.setAttribute('title', text);
-  } catch (error) {
-    releaseMeta.textContent = 'Release data is temporarily unavailable. Please use the GitHub releases page.';
-    releaseStatus.textContent = 'Fallback';
-    footerStatus.textContent = 'Release data unavailable — redirecting to GitHub';
-    ctaText.textContent = 'The latest release is available on GitHub. Download from the official releases page.';
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
 
-    applyApkLink(directApkUrl, 'ReceiptPOS APK');
-  }
-}
+      .container {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
 
-updateLatestRelease();
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+        background: rgba(7, 20, 29, 0.72);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 76px;
+        gap: 20px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #07141d;
+        box-shadow: var(--shadow);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        color: var(--muted);
+        font-size: 0.96rem;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 0.9rem 1.35rem;
+        border-radius: 14px;
+        border: 1px solid transparent;
+        font-weight: 700;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        cursor: pointer;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+      }
+
+      .button-primary {
+        background: linear-gradient(135deg, var(--primary), #59dbe3);
+        color: #062532;
+        box-shadow: 0 18px 36px rgba(76, 201, 240, 0.2);
+      }
+
+      .button-secondary {
+        background: rgba(148, 163, 184, 0.04);
+        border-color: rgba(148, 163, 184, 0.2);
+        color: var(--text);
+      }
+
+      .hero {
+        padding: 76px 0 44px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        align-items: center;
+        gap: 38px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.48rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(76, 201, 240, 0.08);
+        border: 1px solid rgba(76, 201, 240, 0.2);
+        color: var(--primary);
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 20px 0 18px;
+        font-size: clamp(2.7rem, 4vw, 5rem);
+        line-height: 0.98;
+        letter-spacing: -0.05em;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 620px;
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.7;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding-top: 28px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-top: 32px;
+        color: var(--muted);
+      }
+
+      .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.7rem 0.9rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(15, 31, 42, 0.66);
+        font-size: 0.9rem;
+      }
+
+      .status-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+      }
+
+      .hero-visual {
+        position: relative;
+      }
+
+      .phone-frame {
+        position: relative;
+        width: min(100%, 430px);
+        margin: 0 auto;
+        padding: 20px 18px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 32px;
+        background: linear-gradient(180deg, rgba(15, 31, 42, 0.9), rgba(7, 20, 29, 0.9));
+        box-shadow: var(--shadow);
+      }
+
+      .phone-notch {
+        width: 120px;
+        height: 18px;
+        margin: 0 auto 16px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.18);
+      }
+
+      .screen {
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(10, 22, 31, 1), rgba(5, 16, 22, 1));
+        padding: 18px 16px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.13);
+      }
+
+      .screen-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.87rem;
+        margin-bottom: 18px;
+      }
+
+      .menu-dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .menu-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(148, 163, 184, 0.5);
+      }
+
+      .cart-card {
+        display: grid;
+        gap: 12px;
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(18, 34, 46, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.08);
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .value {
+        font-weight: 800;
+      }
+
+      .product-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .product-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(9, 19, 25, 0.9);
+      }
+
+      .product-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(76, 201, 240, 0.3), rgba(124, 58, 237, 0.3));
+        display: grid;
+        place-items: center;
+        font-size: 0.8rem;
+        font-weight: 900;
+      }
+
+      .product-name {
+        font-size: 0.92rem;
+        font-weight: 700;
+      }
+
+      .product-price {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .totals {
+        margin-top: 12px;
+        border-top: 1px solid rgba(148, 163, 184, 0.12);
+        padding-top: 12px;
+      }
+
+      .totals .row {
+        margin-top: 8px;
+      }
+
+      .floating-badge {
+        position: absolute;
+        padding: 0.7rem 0.9rem;
+        background: rgba(9, 19, 25, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+      }
+
+      .badge-left {
+        left: -16px;
+        bottom: 25%;
+      }
+
+      .badge-right {
+        right: -20px;
+        top: 22%;
+      }
+
+      .badge-title {
+        color: var(--muted);
+        font-size: 0.72rem;
+        margin-bottom: 4px;
+      }
+
+      .badge-value {
+        font-size: clamp(1.2rem, 3vw, 1.75rem);
+        font-weight: 900;
+      }
+
+      section {
+        padding: 34px 0;
+      }
+
+      .section-head {
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+        text-align: center;
+        margin-bottom: 28px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 3rem);
+        letter-spacing: -0.04em;
+      }
+
+      .section-head p {
+        margin: 0;
+        max-width: 720px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .feature-grid,
+      .stats-grid,
+      .steps-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .feature-card, .step-card, .stat-card {
+        background: rgba(10, 22, 31, 0.7);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 22px;
+      }
+
+      .feature-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        font-size: 1.4rem;
+        background: linear-gradient(135deg, rgba(76, 201, 240, 0.18), rgba(124, 58, 237, 0.25));
+        border: 1px solid rgba(76, 201, 240, 0.2);
+        margin-bottom: 16px;
+      }
+
+      .feature-card h3,
+      .step-card h3,
+      .stat-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.2rem;
+      }
+
+      .feature-card p,
+      .step-card p,
+      .stat-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .stat-card {
+        text-align: center;
+      }
+
+      .stat-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        letter-spacing: -0.05em;
+      }
+
+      .cta-section {
+        padding: 30px 0 72px;
+      }
+
+      .cta-box {
+        display: grid;
+        grid-template-columns: 1.2fr auto;
+        align-items: center;
+        gap: 20px;
+        background: linear-gradient(135deg, rgba(76, 201, 240, 0.09), rgba(124, 58, 237, 0.12));
+        border: 1px solid rgba(76, 201, 240, 0.18);
+        border-radius: 28px;
+        padding: 30px 28px;
+      }
+
+      .cta-box h3 {
+        margin: 0 0 10px;
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        letter-spacing: -0.04em;
+      }
+
+      .cta-box p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 26px 0 40px;
+        color: var(--muted);
+      }
+
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .release-block {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(15, 31, 42, 0.75);
+      }
+
+      .release-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 84px;
+        padding: 0.45rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(34, 197, 94, 0.12);
+        color: #8ef0a9;
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 920px) {
+        .hero-grid,
+        .feature-grid,
+        .stats-grid,
+        .steps-grid,
+        .cta-box {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          flex-wrap: wrap;
+          justify-content: center;
+          padding: 18px 0;
+        }
+
+        .nav-links {
+          width: 100%;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .badge-left,
+        .badge-right {
+          position: static;
+          margin-top: 14px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .hero {
+          padding-top: 58px;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        .hero-actions {
+          display: grid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container nav">
+        <a href="#top" class="brand" aria-label="Receipt POS home">
+          <span class="brand-mark">R</span>
+          <span>Receipt POS</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#benefits">Why choose us</a>
+          <a href="#download">Download</a>
+        </nav>
+
+        <a
+          id="headerDownloadButton"
+          class="button button-primary"
+          href="https://github.com/Senterprisehub/ReceiptPOS/releases/latest"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Download Receipt POS APK"
+        >
+          Download APK
+        </a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <span class="eyebrow">Offline-first POS system</span>
+            <h1>Turn any Android device into a fast retail checkout counter.</h1>
+            <p>
+              Receipt POS helps stores, cafes, and multi-counter businesses bill faster,
+              print thermal receipts, scan products, accept UPI QR and card payments, and
+              keep inventory and backups synced without internet dependency.
+            </p>
+
+            <div class="hero-actions" id="download">
+              <a
+                id="primaryDownloadButton"
+                class="button button-primary"
+                href="https://github.com/Senterprisehub/ReceiptPOS/releases/latest"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Download the latest Receipt POS APK"
+              >
+                Get the latest APK
+              </a>
+              <a
+                id="downloadLink"
+                class="button button-secondary"
+                href="https://github.com/Senterprisehub/ReceiptPOS/releases/latest"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open Receipt POS release page"
+              >
+                View release notes
+              </a>
+            </div>
+
+            <div class="meta-row" aria-label="Product highlights">
+              <span class="meta-pill"><span class="status-dot"></span> Offline-first</span>
+              <span class="meta-pill">Bluetooth + Wi‑Fi printing</span>
+              <span class="meta-pill">Dynamic UPI QR</span>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-label="Receipt POS dashboard preview">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="screen">
+                <div class="screen-top">
+                  <span>Receipt POS</span>
+                  <div class="menu-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                  </div>
+                </div>
+
+                <div class="cart-card">
+                  <div class="row">
+                    <span class="label">Counter</span>
+                    <span class="value">C1</span>
+                  </div>
+
+                  <div class="product-list">
+                    <div class="product-item">
+                      <div class="product-badge">A</div>
+                      <div>
+                        <div class="product-name">Amul Milk</div>
+                        <div class="product-price">Qty 2 · ₹78</div>
+                      </div>
+                      <div class="value">₹156</div>
+                    </div>
+
+                    <div class="product-item">
+                      <div class="product-badge">B</div>
+                      <div>
+                        <div class="product-name">Bread</div>
+                        <div class="product-price">Qty 1 · ₹42</div>
+                      </div>
+                      <div class="value">₹42</div>
+                    </div>
+                  </div>
+
+                  <div class="totals">
+                    <div class="row">
+                      <span class="label">Subtotal</span>
+                      <span class="value">₹198</span>
+                    </div>
+                    <div class="row">
+                      <span class="label">Discount</span>
+                      <span class="value">-₹18</span>
+                    </div>
+                    <div class="row">
+                      <span class="label">Total</span>
+                      <span class="value">₹180</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="floating-badge badge-left">
+              <div class="badge-title">Live sales</div>
+              <div class="badge-value">₹1.2L</div>
+            </div>
+
+            <div class="floating-badge badge-right">
+              <div class="badge-title">Stock alerts</div>
+              <div class="badge-value">12</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <div class="container">
+          <div class="section-head">
+            <h2>Built for modern store operations</h2>
+            <p>
+              From quick billing to cloud backups, Receipt POS combines speed, security,
+              and flexibility in one Android-first solution.
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="feature-card">
+              <div class="feature-icon">⚡</div>
+              <h3>Fast checkout</h3>
+              <p>Search products instantly, add items in seconds, and handle cash, UPI, and card payments with minimal friction.</p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-icon">🖨️</div>
+              <h3>Thermal printing</h3>
+              <p>Print 58mm and 80mm receipts over Bluetooth or Wi‑Fi with store branding, tax details, and QR verification.</p>
+            </article>
+
+            <article class="feature-card">
+              <div class="feature-icon">📦</div>
+              <h3>Inventory control</h3>
+              <p>Track stock, apply discounts, handle returns, and keep your catalog synced across counters and businesses.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="benefits">
+        <div class="container">
+          <div class="section-head">
+            <h2>Why store owners rely on Receipt POS</h2>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <strong>100%</strong>
+              <p>Offline-first billing so sales keep moving even without internet access.</p>
+            </div>
+            <div class="stat-card">
+              <strong>58mm</strong>
+              <p>Support for thermal printers used by retail counters, cafes, and quick-service stores.</p>
+            </div>
+            <div class="stat-card">
+              <strong>UPI</strong>
+              <p>Dynamic QR generation for payment collection and better customer checkout experience.</p>
+            </div>
+            <div class="stat-card">
+              <strong>Drive</strong>
+              <p>Google Drive backup to protect inventory, invoices, and store data across devices.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="section-head">
+            <h2>Simple workflow, powerful operations</h2>
+          </div>
+
+          <div class="steps-grid">
+            <div class="step-card">
+              <h3>1. Add products</h3>
+              <p>Import inventory, scan barcodes, or add sales items on the fly during busy hours.</p>
+            </div>
+            <div class="step-card">
+              <h3>2. Bill and print</h3>
+              <p>Generate invoices, apply discounts, collect payment, and print a branded receipt instantly.</p>
+            </div>
+            <div class="step-card">
+              <h3>3. Backup and scale</h3>
+              <p>Sync business records to Google Drive and manage multiple counters or branches with confidence.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <div class="container">
+          <div class="cta-box">
+            <div>
+              <h3>Launch faster with a smarter POS workflow.</h3>
+              <p id="ctaText">Download the latest Receipt POS APK and upgrade your checkout experience today.</p>
+            </div>
+            <a
+              id="primaryDownloadButtonCta"
+              class="button button-primary"
+              href="https://github.com/Senterprisehub/ReceiptPOS/releases/latest"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Download the Receipt POS APK"
+            >
+              Download now
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-inner">
+        <div>
+          <strong>Receipt POS</strong>
+          <span> · Retail and café billing software</span>
+        </div>
+
+        <div class="release-block" aria-live="polite">
+          <span class="release-badge" id="releaseStatus">Latest</span>
+          <span id="releaseMeta">Loading latest release…</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const releaseApiUrl = 'https://api.github.com/repos/Senterprisehub/ReceiptPOS/releases/latest';
+      const fallbackReleaseUrl = 'https://github.com/Senterprisehub/ReceiptPOS/releases/latest';
+      const directApkUrl = 'https://github.com/Senterprisehub/ReceiptPOS/releases/latest';
+
+      const downloadLink = document.getElementById('downloadLink');
+      const primaryDownloadButton = document.getElementById('primaryDownloadButton');
+      const secondaryCtaButton = document.getElementById('primaryDownloadButtonCta');
+      const headerDownloadButton = document.getElementById('headerDownloadButton');
+      const releaseMeta = document.getElementById('releaseMeta');
+      const releaseStatus = document.getElementById('releaseStatus');
+      const ctaText = document.getElementById('ctaText');
+      const isAndroidDevice = /Android/i.test(navigator.userAgent || '');
+
+      function applyApkLink(url, label) {
+        const links = [downloadLink, primaryDownloadButton, secondaryCtaButton, headerDownloadButton].filter(Boolean);
+
+        links.forEach((link) => {
+          link.href = url;
+          link.setAttribute('aria-label', `Download ${label}`);
+          link.setAttribute('download', 'ReceiptPOS.apk');
+          link.target = isAndroidDevice ? '_self' : '_blank';
+          link.rel = isAndroidDevice ? '' : 'noopener noreferrer';
+        });
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return 'Unknown date';
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }).format(date);
+      }
+
+      async function updateLatestRelease() {
+        try {
+          const response = await fetch(releaseApiUrl, {
+            headers: {
+              Accept: 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Unable to fetch release data');
+          }
+
+          const data = await response.json();
+          const asset = Array.isArray(data.assets) && data.assets.length > 0 ? data.assets[0] : null;
+          const apkUrl = asset ? asset.browser_download_url : fallbackReleaseUrl;
+          const versionLabel = data.tag_name || 'Latest Release';
+          const publishedDate = formatDate(data.published_at || data.created_at);
+          const text = `Version ${versionLabel} · Published ${publishedDate}`;
+
+          releaseMeta.textContent = text;
+          releaseStatus.textContent = 'Newest';
+          ctaText.textContent = `Current version: ${versionLabel}. Download the APK optimized for Android devices.`;
+          applyApkLink(apkUrl, versionLabel);
+        } catch (error) {
+          releaseMeta.textContent = 'Release data is temporarily unavailable. Please use GitHub releases.';
+          releaseStatus.textContent = 'Fallback';
+          ctaText.textContent = 'The latest release is available on GitHub. Download from the official releases page.';
+          applyApkLink(directApkUrl, 'ReceiptPOS APK');
+        }
+      }
+
+      updateLatestRelease();
+    </script>
+  </body>
+</html>
